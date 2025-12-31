@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fukuoka Travel Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fffafb; color: #5a4a4a; }
+        .date-tab.active { background-color: #ffcad4; color: #fff; box-shadow: 0 4px 6px -1px rgba(255, 202, 212, 0.4); }
+        .itinerary-card { background: #ffffff; border: 1px solid #fce4ec; transition: transform 0.2s; }
+        .itinerary-card:active { transform: scale(0.98); }
+        .time-badge { background-color: #fdf2f2; color: #d88a8a; }
+        .category-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; background-color: #f0f4f8; color: #718096; }
+        .category-food { background-color: #fff0f0; color: #e57373; }
+        .category-shop { background-color: #f0f7ff; color: #64b5f6; }
+        .category-sight { background-color: #f1f8e9; color: #81c784; }
+        .category-coffee { background-color: #efebe9; color: #a1887f; }
+    </style>
+</head>
+<body class="pb-10">
+    <header class="sticky top-0 z-50 bg-[#fffafb]/80 backdrop-blur-md border-b border-[#fce4ec] px-4 py-4">
+        <h1 class="text-center text-xl font-bold tracking-widest text-[#d88a8a] mb-4">FUKUOKA MEMORIES</h1>
+        <div id="date-tabs" class="flex justify-between overflow-x-auto gap-2 no-scrollbar px-2"></div>
+    </header>
+    <main class="px-4 mt-6">
+        <div id="itinerary-list" class="grid gap-4"></div>
+    </main>
+    <script>
+        const itineraryData = {
+            "01/09 (週五)": [
+                { time: "08:00", title: "桃園國際機場", desc: "第二航廈出發", cat: "sight" },
+                { time: "11:26", title: "Via Inn 博多口站前", desc: "Check-in / 寄放行李", cat: "sight" },
+                { time: "12:34", title: "麵屋兼虎 博多DEITOS店", desc: "必吃招牌辛辣沾麵", cat: "food" },
+                { time: "13:41", title: "FUGLEN FUKUOKA", desc: "北歐風格精品咖啡", cat: "coffee" },
+                { time: "15:00", title: "櫛田神社 & 川端通", desc: "博多守護神與老街散策", cat: "sight" },
+                { time: "17:00", title: "天神西通購物", desc: "SHIRO, KBF, mont-bell", cat: "shop" },
+                { time: "20:30", title: "Yakiniku AGITO HIRAO", desc: "高品質質感燒肉", cat: "food" }
+            ],
+            "01/10 (週六)": [
+                { time: "08:00", title: "前往由布院", desc: "搭乘特急列車 (由布院之森)", cat: "sight" },
+                { time: "12:39", title: "由布釜飯「心」", desc: "金鱗湖本店，建議提早排隊", cat: "food" },
+                { time: "13:42", title: "金鱗湖 & 水上鳥居", desc: "絕美湖景與天祖神社", cat: "sight" },
+                { time: "15:30", title: "湯布院散策", desc: "貓頭鷹之森林、花卉村", cat: "sight" },
+                { time: "18:00", title: "甜點巡禮", desc: "Milch起司蛋糕、可麗露", cat: "food" },
+                { time: "21:01", title: "博多牛腸鍋 大山", desc: "KITTE博多店", cat: "food" }
+            ],
+            "01/11 (週日)": [
+                { time: "09:00", title: "太宰府參拜", desc: "竈門神社、天開稻荷神社", cat: "sight" },
+                { time: "11:09", title: "太宰府天滿宮", desc: "參拜與表參道散策", cat: "sight" },
+                { time: "12:16", title: "YAMAYA BASE", desc: "太宰府明太子料理", cat: "food" },
+                { time: "14:55", title: "天神選物之旅", desc: "麵屋Gaga、藍瓶咖啡", cat: "coffee" },
+                { time: "18:08", title: "dacō 福岡", desc: "人氣排隊麵包店", cat: "food" },
+                { time: "20:30", title: "Mina 天神", desc: "大型百貨購物", cat: "shop" }
+            ],
+            "01/12 (週一)": [
+                { time: "09:30", title: "博多車站購物", desc: "AMU PLAZA, MARKS & WEB", cat: "shop" },
+                { time: "11:21", title: "FUK Coffee", desc: "機場主題特色咖啡", cat: "coffee" },
+                { time: "12:25", title: "博多祇園鐵鍋煎餃", desc: "在地必吃排隊名店", cat: "food" },
+                { time: "13:44", title: "大濠公園", desc: "湖畔漫步與 FUK COFFEE Parks", cat: "sight" },
+                { time: "17:00", title: "赤坂選物店巡禮", desc: "NONE TOO SOON 等精緻小店", cat: "shop" },
+                { time: "19:30", title: "燒肉上", desc: "精緻和牛饗宴", cat: "food" }
+            ],
+            "01/13 (週二)": [
+                { time: "09:30", title: "Dacomecca", desc: "視覺系人氣麵包店", cat: "food" },
+                { time: "10:33", title: "Coffee County", desc: "手沖咖啡時光", cat: "coffee" },
+                { time: "11:39", title: "博多雞soba 建 TATERU", desc: "雞白湯拉麵結尾", cat: "food" },
+                { time: "13:30", title: "前往福岡機場", desc: "最後伴手禮採買", cat: "sight" }
+            ]
+        };
+        let activeDate = Object.keys(itineraryData)[0];
+        function renderTabs() {
+            const container = document.getElementById('date-tabs');
+            container.innerHTML = '';
+            Object.keys(itineraryData).forEach(date => {
+                const btn = document.createElement('button');
+                btn.className = `date-tab flex-shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-all ${activeDate === date ? 'active' : 'text-[#8a7a7a] bg-white border border-[#fce4ec]'}`;
+                btn.innerText = date;
+                btn.onclick = () => { activeDate = date; renderTabs(); renderItinerary(); };
+                container.appendChild(btn);
+            });
+        }
+        function renderItinerary() {
+            const container = document.getElementById('itinerary-list');
+            container.innerHTML = '';
+            itineraryData[activeDate].forEach(item => {
+                const card = document.createElement('div');
+                card.className = "itinerary-card p-4 rounded-2xl shadow-sm flex items-start gap-4";
+                let catLabel = item.cat === 'food' ? "美食" : item.cat === 'coffee' ? "咖啡" : item.cat === 'shop' ? "購物" : "景點";
+                card.innerHTML = `
+                    <div class="flex-shrink-0 w-16 text-center">
+                        <span class="time-badge block text-[10px] font-bold py-1 rounded-lg mb-1">${item.time}</span>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-1 gap-2">
+                            <h3 class="font-bold text-gray-800 text-sm leading-tight">${item.title}</h3>
+                            <span class="category-tag category-${item.cat} flex-shrink-0">${catLabel}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 font-light">${item.desc}</p>
+                    </div>`;
+                container.appendChild(card);
+            });
+        }
+        renderTabs();
+        renderItinerary();
+    </script>
+</body>
+</html>
